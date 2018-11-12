@@ -17,6 +17,7 @@ del df['status']
 del df['enabled']
 del df['limit_cv']
 del df['uppdate']
+del df['budgetleft']
 
 # print(df['job_board_id'])
 
