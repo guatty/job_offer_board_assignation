@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 # import tensorflow as tf
 # from tensorflow import keras
 import pandas as pd
@@ -5,11 +8,11 @@ import pandas as pd
 # print(tf.__version__)
 # print(keras.__version__)
 
-df = pd.read_csv('../df_stats.csv')
+df = pd.read_csv('data/df_stats.csv', index_col=0)
 
 # print(list(df))
 
-del df['Unnamed: 0']
+#del df['Unnamed: 0']
 del df['title.1']
 del df['name.1']
 del df['job_group_id']
