@@ -35,8 +35,8 @@ for action in range(5):
 del df['action']
 del df['amount_action']
 
-grouped = df.groupby(['id', 'creation'])
-
+grouped = df.groupby(['id', 'creation']).sum()
+#grouped = df.drop_duplicates(["creation", "id"])
 print(grouped)
 
 grouped.to_csv("data/grouped.csv")
