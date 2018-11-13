@@ -8,18 +8,11 @@ import pandas as pd
 # print(tf.__version__)
 # print(keras.__version__)
 
-<<<<<<< HEAD
-df = pd.read_csv('data/df_stats.csv')
-
-# print(list(df))
-
-=======
 df = pd.read_csv('data/df_stats.csv', index_col=0)
 
 # print(list(df))
 
 #del df['Unnamed: 0']
->>>>>>> 8d6568af2267da779e0fe4471ee5f002839e2735
 del df['title.1']
 del df['name.1']
 del df['job_group_id']
