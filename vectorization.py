@@ -56,23 +56,37 @@ def vectorize_column(data_column):
     vector_data = tokenizer.texts_to_sequences(data_column)
     return vector_data
 
-def create_csv(dataframe,column_to_remove,column_to_add):
+def replace_text_by_vector(dataframe,column_to_remove,name_column_to_add,column_to_add):
     del dataframe[column_to_remove]
-    dataframe["vector_description"] = pd.Series(column_to_add, index = dataframe.index)
-    dataframe.to_csv('vector.csv') 
+    dataframe[name_column_to_add] = pd.Series(column_to_add, index = dataframe.index)
+    #dataframe.to_csv('vector.csv') 
+    return dataframe
 
 #=================================================================
 # test
 #=================================================================
 
 df = pd.read_csv('small_data.csv', delimiter=',', encoding="utf-8")
+
+# Vectorization of description column
+
 description_column = df["description"]
 clean_description_column = clean_tab(description_column)
 clean_description_column = remove_html_pattern(clean_description_column)
 vector_description = vectorize_column(clean_description_column)
-print(len(df))
-print(len(vector_description))
-create_csv(df,"description",vector_description)
+df = replace_text_by_vector(df,"description",vector_description,"vector_description")
+
+# Vectorization of title column
+
+title_column = df["title"]
+clean_title_column = clean_tab(title_column)
+clean_title_column = remove_html_pattern(clean_title_column)
+vector_title = vectorize_column(clean_title_column)
+df = replace_text_by_vector(df,"title",vector_description,"vector_title")
+
+# Vectorization of title column
+
+
 
 
 
