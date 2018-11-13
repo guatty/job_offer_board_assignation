@@ -10,17 +10,15 @@ from tqdm import tqdm
 
 # print(tf.__version__)
 # print(keras.__version__)
-"""
-
 df = pd.read_csv('data/df_stats.csv', index_col=0)
 
-# print(list(df))
 
 #del df['Unnamed: 0'] # Not del'd since used as index.
 del df['title.1']
 del df['name.1']
 del df['job_group_id']
 del df['status']
+del df['keywords']
 del df['enabled']
 del df['limit_cv']
 del df['uppdate']
@@ -29,18 +27,8 @@ del df['employer']
 
 df = df.dropna()
 
-
-# print(df.corr())
-
-# print(df['job_board_id'])
-
 df.to_csv('data/preprocessed_campaigns.csv')
 
-# a = df['job_board_id'].corr(df['title'], method='spearman') # 0.015116500377894835
-
-# print(a)
-
-"""
 
 def unify_job_types(jt):
     if jt == "Apprenticeship":
@@ -55,10 +43,8 @@ def unify_job_types(jt):
         return jt
 
 
-df = pd.read_csv('data/preprocessed_campaigns.csv')
-# print(list(df))
+#df = pd.read_csv('data/preprocessed_campaigns.csv')
 
-i=0
 legacy_columns = ['id', 'title', 'category', 'country', 'cpc', 'name', 'keywords', 'description', 'job_type', 'job', 'job_board_id', 'budgetmax']
 new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'taux_conversion', "taux_conversion_pondere", 'creation_an', 'creation_mois', 'creation_jour']
 
@@ -99,38 +85,3 @@ for result in tqdm(df.groupby(['id', 'creation']), desc="Preprocessing: "):
 
 
 new_df.to_csv('data/cleaned_preprocessed_campaigns.csv')
-
-
-#new_df = pd.DataFrame(columns=['id', 'title', 'category', 'country', 'cpc', 'name', 'keywords', 'description', 'job_type', 'employer', 'job', 'job_board_id', 'amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'budgetmax', 'budgetleft', 'creation'])
-#for row in df.groupby(['id', 'creation']):
-
-# def fuse_action_row_into_columns(df):
-#     print(df)
-#     if df['action'] in [0, 1, 2, 3, 4]:
-#         print(df[''])
-#     if 'Fruit' in df.values:
-#        num_val = df[df['Property'] == 'Red']['Numerical_value'].values[0]
-#        return pd.Series({'Red&Fruit': '1', 'Num_val': num_val})
-#     elif 'Red' in df.values:
-#        num_val= df[df['Property'] == 'Red']['Num_val'].values[0]
-#        return pd.Series({'Just_red': '1', 'Num_val': num_val})
-#     else:
-#        return pd.Series({'Other': '1', 'Num_val': 0})
-
-# grouped = df.groupby(['id', 'creation'])['action', 'amount_action'].apply(fuse_action_row_into_columns)
-
-# def f(row, action):
-#     if row['action'] == action:
-#         return row['amount_action']
-
-# for action in range(5):
-#     df['amount_action_'+str(action)] = df.apply( lambda row: f(row, action), axis=1)
-
-# del df['action']
-# del df['amount_action']
-
-# grouped = df.groupby(['id', 'creation']).sum()
-# #grouped = df.drop_duplicates(["creation", "id"])
-# print(grouped)
-
-# grouped.to_csv("data/grouped.csv")
