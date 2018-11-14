@@ -14,8 +14,6 @@ class Preprocess:
 
 
 
-
-
     def __init__(self, raw_data_path = 'data/df_stats.csv', output_filepath='data/cleaned_preprocessed_campaigns.csv'):
         self.legacy_columns = ['id', 'title', 'category', 'country', 'name', 'keywords', 'description', 'job_type', 'job', 'job_board_id', 'budgetmax', 'creation']
         self.new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", "volume_conversion", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
@@ -26,7 +24,6 @@ class Preprocess:
     def execute_standard(self, raw, output):
         self.df = pd.read_csv(raw, index_col=0)
         self.remove_useless_data()
-
 
         self.new_df = pd.DataFrame(columns=self.legacy_columns + self.new_columns)
 
