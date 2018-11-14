@@ -37,3 +37,6 @@ def get_stat(job_offer_id):
             
 
     return stats
+
+
+print(get_stat(4717))

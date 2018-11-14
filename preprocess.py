@@ -14,7 +14,7 @@ import calendar
 # print(tf.__version__)
 # print(keras.__version__)
 df = pd.read_csv('data/df_stats.csv', index_col=0)
-
+print(df)
 
 #del df['Unnamed: 0'] # Not del'd since used as index.
 del df['title.1']
@@ -30,7 +30,7 @@ del df['employer']
 
 df = df.dropna()
 
-df.to_csv('data/preprocessed_campaigns.csv')
+#df.to_csv('data/preprocessed_campaigns.csv')
 
 
 def unify_job_types(jt):
