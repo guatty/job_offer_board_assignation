@@ -8,6 +8,9 @@ from math import sqrt
 
 from tqdm import tqdm
 
+import datetime
+import calendar
+
 # print(tf.__version__)
 # print(keras.__version__)
 df = pd.read_csv('data/df_stats.csv', index_col=0)
@@ -45,8 +48,8 @@ def unify_job_types(jt):
 
 #df = pd.read_csv('data/preprocessed_campaigns.csv')
 
-legacy_columns = ['id', 'title', 'category', 'country', 'cpc', 'name', 'keywords', 'description', 'job_type', 'job', 'job_board_id', 'budgetmax']
-new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'taux_conversion', "taux_conversion_pondere", 'creation_an', 'creation_mois', 'creation_jour']
+legacy_columns = ['id', 'title', 'category', 'country', 'name', 'keywords', 'description', 'job_type', 'job', 'job_board_id', 'budgetmax', 'creation']
+new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
 
 new_df = pd.DataFrame(columns=legacy_columns + new_columns)
 for result in tqdm(df.groupby(['id', 'creation']), desc="Preprocessing: "):
@@ -65,23 +68,27 @@ for result in tqdm(df.groupby(['id', 'creation']), desc="Preprocessing: "):
             line['creation_an'] = an
             line['creation_mois'] = mois
             line['creation_jour'] = jour
+            my_date = datetime.date(int(an), int(mois), int(jour)).weekday()
+            str_date = calendar.day_name[my_date]
+            line['weekday'] = str_date
 
 
     for index, row in result[1].iterrows():
-        action_id = row['action'] 
+        action_id = row['action']
         if action_id in range(5):
             line['amount_action_' + str(int(action_id))] += row['amount_action']
-        line['cpc'] += row['cpc']
+        line['total_cost'] += row['cpc']
 
-    conversion_volume = line['amount_action_2'] + line['amount_action_3'] 
+    conversion_volume = line['amount_action_2'] + line['amount_action_3']
     if line['amount_action_0'] != 0 and conversion_volume <= line['amount_action_0']:
-        line['taux_conversion'] = conversion_volume / line['amount_action_0'] 
+        line['taux_conversion'] = conversion_volume / line['amount_action_0']
         line['taux_conversion_pondere'] = line['taux_conversion'] * sqrt(conversion_volume)
+        line['true_cpc'] = line['total_cost'] / line['amount_action_0']
 
-    line['job_type'] = unify_job_types(line['job_type'])
+        line['job_type'] = unify_job_types(line['job_type'])
 
-    df_line  = pd.DataFrame(line, columns=new_df.columns, index=[0])
-    new_df = pd.concat([new_df, df_line])
+        df_line  = pd.DataFrame(line, columns=new_df.columns, index=[0])
+        new_df = pd.concat([new_df, df_line])
 
 
 new_df.to_csv('data/cleaned_preprocessed_campaigns.csv')
