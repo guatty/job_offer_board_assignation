@@ -7,7 +7,16 @@ Created on Mon Nov 12 18:13:26 2018
 """
 
 import pandas as pd # manipulation de csv
+import frequency_terms as freq
 from keras.preprocessing.text import Tokenizer
+
+
+# tf_idf 
+import nltk
+from collections import Counter
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer
+###
 
 from nltk.corpus import stopwords  # text preproccess
 import html2text
@@ -15,6 +24,16 @@ import html2text
 
 ENGLISH_STOPWORDS = set(stopwords.words("english"))
 FRENCH_STOPWORDS = set(stopwords.words("french"))
+FRENCH_STOPWORDS.add('dont')
+FRENCH_STOPWORDS.add('votre')
+FRENCH_STOPWORDS.add('notre')
+FRENCH_STOPWORDS.add('autres')
+FRENCH_STOPWORDS.add('autre')
+FRENCH_STOPWORDS.add('sans')
+FRENCH_STOPWORDS.add('leurs')
+FRENCH_STOPWORDS.add('desormais')
+FRENCH_STOPWORDS.add('nous')
+FRENCH_STOPWORDS.add('si')
 
 MAX_NB_WORDS= 200000
 #print(html2text.html2text(contenu_col))
@@ -47,7 +66,6 @@ def remove_html_pattern(column):
         without_html_tab.append(element_without_html)
     return without_html_tab
         
-
 def vectorize_column(data_column):
     tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(data_column)
@@ -61,18 +79,62 @@ def replace_text_by_vector(dataframe,column_to_remove,column_to_add,name_column_
 
 def convert_df_to_csv(dataframe):
     dataframe.to_csv('vectorized_campaigns.csv') 
+    
+#=================================================================
+# tf_idf functions
+#=================================================================
+def prepare_tf_idf(tab):
+    cv=CountVectorizer(max_df=0.85)
+    word_count_vector=cv.fit_transform(tab)
+    feature_names=cv.get_feature_names()
+    return cv,word_count_vector,feature_names
 
+def compute_tf_idf(text,wd,cv,feature_names):
+    tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
+    tfidf_transformer.fit(wd)
+    #generate tf-idf for the given document
+    tf_idf_vector=tfidf_transformer.transform(cv.transform([text]))
+    sorted_items=freq.sort_coo(tf_idf_vector.tocoo())
+    keywords=freq.extract_topn_from_vector(feature_names,sorted_items,15)
+    return keywords
+
+def compute_tf_idf_column(column,wd,cv,feature_names):
+    tab_tf_idf_text = []
+    for text in column :
+        tf_idf = compute_tf_idf(text,wd,cv,feature_names)
+        tab_tf_idf_text.append(tf_idf)
+    return tab_tf_idf_text
+
+def get_keys(array_of_tf_idf):
+    tab_keys =[]
+    for dictionnaire in array_of_tf_idf:
+        keys = dictionnaire.keys()
+        tab_keys.append(keys)
+    return tab_keys
+    
+    
+    
+        
 #=================================================================
 # test
 #=================================================================
 
-df = pd.read_csv('cleaned_preprocessed_campaigns.csv', delimiter=',', encoding="utf-8")
+
+
+df = pd.read_csv('small_data.csv', delimiter=',', encoding="utf-8")
 
 # Vectorization of description column
 
 description_column = df["description"]
-clean_description_column = clean_tab(description_column)
-clean_description_column = remove_html_pattern(clean_description_column)
+clean_description_column = remove_html_pattern(description_column)
+clean_description_column = clean_tab(clean_description_column)
+
+cv, word_count_vec, feature_names = prepare_tf_idf(clean_description_column)
+keywords = compute_tf_idf_column(clean_description_column,word_count_vec,cv,feature_names)
+keys = get_keys(keywords)
+
+
+'''
 vector_description = vectorize_column(clean_description_column)
 df = replace_text_by_vector(df,"description",vector_description,"vector_description")
 
@@ -111,7 +173,7 @@ vector_job_type = vectorize_column(job_type_column)
 df = replace_text_by_vector(df,"job_type",vector_job_type,"vector_job_type")
 
 convert_df_to_csv(df)
-
+'''
 
 
 
