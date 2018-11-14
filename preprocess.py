@@ -45,21 +45,19 @@ class Preprocess:
             return jt
 
     def remove_useless_data(self):
-        df = self.df
-        #del df['Unnamed: 0'] # Not del'd since used as index.
-        del df['title.1']
-        del df['name.1']
-        del df['job_group_id']
-        del df['status']
-        del df['keywords']
-        del df['enabled']
-        del df['limit_cv']
-        del df['uppdate']
-        del df['budgetleft']
-        del df['employer']
+        #del self.df['Unnamed: 0'] # Not del'd since used as index.
+        del self.df['title.1']
+        del self.df['name.1']
+        del self.df['job_group_id']
+        del self.df['status']
+        del self.df['keywords']
+        del self.df['enabled']
+        del self.df['limit_cv']
+        del self.df['uppdate']
+        del self.df['budgetleft']
+        del self.df['employer']
 
-        df = df.dropna()
-        return df
+        self.df = self.df.dropna()
 
     def preprocess_line(self, result):
         self.line = {}
