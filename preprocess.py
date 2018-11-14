@@ -10,7 +10,7 @@ import datetime
 import calendar
 
 
-class preprocess:
+class Preprocess:
 
 
 
@@ -62,58 +62,53 @@ class preprocess:
         return df
 
     def preprocess_line(self, result):
-        line = self.init_new_line()
-        line = self.calculate_amount_action_and_cost(result, line)
-        conversion_volume = line['amount_action_2'] + line['amount_action_3']
-        if line['amount_action_0'] != 0 and conversion_volume <= line['amount_action_0']:
+        self.line = {}
+        self.init_new_line()
+        self.calculate_amount_action_and_cost(result)
+        conversion_volume = self.line['amount_action_2'] + self.line['amount_action_3']
+        if self.line['amount_action_0'] != 0 and conversion_volume <= self.line['amount_action_0']:
 
             for col_name, column_value in result[1].iloc[0].iteritems():
-                line = self.set_job_offer_info(line, column_value, col_name)
+                self.set_job_offer_info(column_value, col_name)
 
-            line = self.set_additional_indicators(result, line, conversion_volume)
-            line['job_type'] = self.unify_job_types(line['job_type'])
+            self.set_additional_indicators(result, conversion_volume)
+            self.line['job_type'] = self.unify_job_types(self.line['job_type'])
 
             # inputs line
-            df_line  = pd.DataFrame(line, columns=self.new_df.columns, index=[0])
+            df_line = pd.DataFrame(columns=self.new_df.columns, index=[0])
             self.new_df = pd.concat([self.new_df, df_line])
 
 
     def init_new_line(self):
-        line = {}
         for col_name in self.new_columns:
-            line[col_name] = 0
-        return line
+            self.line[col_name] = 0
 
-    def set_job_offer_info(self, line, column_value, col_name):
+    def set_job_offer_info(self, column_value, col_name):
         if col_name in self.legacy_columns:
-            line[col_name] = column_value
+            self.line[col_name] = column_value
 
         if col_name == "creation":
             an, mois, jour = column_value.split('-')
-            line['creation_an'] = an
-            line['creation_mois'] = mois
-            line['creation_jour'] = jour
+            self.line['creation_an'] = an
+            self.line['creation_mois'] = mois
+            self.line['creation_jour'] = jour
             my_date = datetime.date(int(an), int(mois), int(jour)).weekday()
             str_date = calendar.day_name[my_date]
-            line['weekday'] = str_date
+            self.line['weekday'] = str_date
 
-        return line
-
-    def calculate_amount_action_and_cost(self, result, line):
+    def calculate_amount_action_and_cost(self, result):
         for index, row in result[1].iterrows():
             action_id = row['action']
             if action_id in range(5):
-                line['amount_action_' + str(int(action_id))] += row['amount_action']
-            line['total_cost'] += row['cpc']
-        return line
+                self.line['amount_action_' + str(int(action_id))] += row['amount_action']
+            self.line['total_cost'] += row['cpc']
 
-    def set_additional_indicators(self, result, line, conversion_volume):
-        line['volume_conversion'] = conversion_volume
-        line['taux_conversion'] = conversion_volume / line['amount_action_0']
-        line['taux_conversion_pondere'] = line['taux_conversion'] * sqrt(conversion_volume)
-        line['true_cpc'] = line['total_cost'] / line['amount_action_0']
-        return line
+    def set_additional_indicators(self, result, conversion_volume):
+        self.line['volume_conversion'] = conversion_volume
+        self.line['taux_conversion'] = conversion_volume / self.line['amount_action_0']
+        self.line['taux_conversion_pondere'] = self.line['taux_conversion'] * sqrt(conversion_volume)
+        self.line['true_cpc'] = self.line['total_cost'] / self.line['amount_action_0']
 
 if __name__ == '__main__':
-    pp = preprocess()
+    pp = Preprocess()
     preprocess.execute_standard()
