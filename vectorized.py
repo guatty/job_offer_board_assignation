@@ -22,6 +22,7 @@ from nltk.corpus import stopwords  # text preproccess
 import html2text
 
 import csv
+import tqdm
 
 
 ENGLISH_STOPWORDS = set(stopwords.words("english"))
@@ -39,7 +40,12 @@ FRENCH_STOPWORDS.add('si')
 FRENCH_STOPWORDS.add('les')
 FRENCH_STOPWORDS.add('lui')
 
+
 MAX_NB_WORDS= 1000
+
+
+NB_KEYWORDS = 42
+
 #print(html2text.html2text(contenu_col))
 #df = pd.read_csv('test_correl.csv', delimiter=',', encoding="utf-8-sig")
 
@@ -159,9 +165,48 @@ keywords = compute_tf_idf_column(clean_description_column,word_count_vec,cv,feat
 
 keys = get_keys(keywords)
 '''
-
-
 '''
+all_ids = []
+# all_words = []
+# for words in keys:
+#     for key in words:
+#         if not (key in all_words):
+#             all_words.append(key)
+#
+# print(len(all_words))
+
+with open('data/truc2.csv', 'w') as csvfile:
+    spamwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
+    my_header = []
+    my_header.append("my_id")
+    my_header.append("my_title")
+    for i in range(NB_KEYWORDS):
+        my_header.append("keyword_"+str(i))
+    # for word in all_words:
+    #     my_header.append(word)
+    spamwriter.writerow(my_header)
+    for index in range(len(keywords)):
+        if not (df['id'][index] in all_ids):
+            final_list = []
+            all_ids.append(df['id'][index])
+            final_list.append(df['id'][index])
+            final_list.append(df['title'][index].replace('"', ''))
+            # for word in all_words:
+            #     found = False
+            #     for key in keys[index]:
+            #         if (key == word):
+            #             final_list.append(1)
+            #             found = True
+            #         if not found:
+            #             final_list.append("?")
+            # spamwriter.writerow(final_list)
+            for key in keys[index]:
+                    final_list.append(key)
+            if (len(keys[index]) == NB_KEYWORDS):
+                spamwriter.writerow(final_list)
+
+
+
 vector_description = vectorize_column(clean_description_column)
 df = replace_text_by_vector(df,"description",vector_description,"vector_description")
 

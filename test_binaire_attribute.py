@@ -11,7 +11,7 @@ import csv
 import pandas as pd # manipulation de csv
 
 
-df = pd.read_csv('truc4.csv', delimiter=',', encoding="utf-8")
+df = pd.read_csv('data/truc4.csv', delimiter=',', encoding="utf-8")
 
 columnes = df.columns
 
@@ -24,24 +24,24 @@ def extract_diffrent_words(column):
         if not word in tab_key_words:
             tab_key_words.append(word)
 
-        
+
 
 
 def foreach_column():
     for colonne in attributs_key_words:
         extract_diffrent_words(df[colonne])
-    
-        
+
+
 
 
 a = foreach_column()
 
 
 
-with open('truc5.csv', 'w') as csvfile:
+with open('data/truc5.csv', 'w') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
     spamwriter.writerow(tab_key_words)
-    with open('truc4.csv', 'r') as csvfile2:
+    with open('data/truc4.csv', 'r') as csvfile2:
         reader = csv.reader(csvfile2)
         for row in reader :
             liste = []
@@ -54,30 +54,3 @@ with open('truc5.csv', 'w') as csvfile:
                 if not found:
                     liste.append("?")
             spamwriter.writerow(liste)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

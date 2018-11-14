@@ -30,7 +30,9 @@ del df['employer']
 
 df = df.dropna()
 
-#df.to_csv('data/preprocessed_campaigns.csv')
+
+# df.to_csv('data/preprocessed_campaigns.csv')
+
 
 
 def unify_job_types(jt):
@@ -49,7 +51,7 @@ def unify_job_types(jt):
 #df = pd.read_csv('data/preprocessed_campaigns.csv')
 
 legacy_columns = ['id', 'title', 'category', 'country', 'name', 'keywords', 'description', 'job_type', 'job', 'job_board_id', 'budgetmax', 'creation']
-new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
+new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", "volume_conversion", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
 
 new_df = pd.DataFrame(columns=legacy_columns + new_columns)
 for result in tqdm(df.groupby(['id', 'creation']), desc="Preprocessing: "):
@@ -80,6 +82,7 @@ for result in tqdm(df.groupby(['id', 'creation']), desc="Preprocessing: "):
         line['total_cost'] += row['cpc']
 
     conversion_volume = line['amount_action_2'] + line['amount_action_3']
+    line['volume_conversion'] = conversion_volume
     if line['amount_action_0'] != 0 and conversion_volume <= line['amount_action_0']:
         line['taux_conversion'] = conversion_volume / line['amount_action_0']
         line['taux_conversion_pondere'] = line['taux_conversion'] * sqrt(conversion_volume)
