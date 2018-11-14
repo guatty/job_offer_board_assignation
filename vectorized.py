@@ -23,6 +23,7 @@ from nltk.corpus import stopwords  # text preproccess
 import html2text
 
 import csv
+import tqdm
 
 ENGLISH_STOPWORDS = set(stopwords.words("english"))
 FRENCH_STOPWORDS = set(stopwords.words("french"))
@@ -39,7 +40,7 @@ FRENCH_STOPWORDS.add('si')
 
 MAX_NB_WORDS= 200000
 
-NB_KEYWORDS = 10
+NB_KEYWORDS = 42
 
 #print(html2text.html2text(contenu_col))
 #df = pd.read_csv('test_correl.csv', delimiter=',', encoding="utf-8-sig")
@@ -141,20 +142,20 @@ keys = get_keys(keywords)
 print("a")
 
 all_ids = []
-all_words = []
-for words in keys:
-    for key in words:
-        if not (key in all_words):
-            all_words.append(key)
-
-print(len(all_words))
+# all_words = []
+# for words in keys:
+#     for key in words:
+#         if not (key in all_words):
+#             all_words.append(key)
+#
+# print(len(all_words))
 
 with open('data/truc2.csv', 'w') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
     my_header = []
     my_header.append("my_id")
     my_header.append("my_title")
-    for i in range(10):
+    for i in range(NB_KEYWORDS):
         my_header.append("keyword_"+str(i))
     # for word in all_words:
     #     my_header.append(word)
