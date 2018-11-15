@@ -112,6 +112,7 @@ class Preprocess:
 
                 self.line[col_name] = clean_desc(column_value)
             elif col_name == "job_board_id":
+                self.line["job_board_id"] = column_value
                 self.line["job_board_name"] = self.jobboard_name_for_id[int( column_value )]
             else:
                 self.line[col_name] = column_value
