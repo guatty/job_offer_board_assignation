@@ -100,7 +100,7 @@ class Preprocess:
                     text = text.strip().lower().split()
                     text = filter(lambda word: word not in self.english_sw, text)
                     text = filter(lambda word: word not in self.french_sw, text)
-                    text = filter(lambda word: len(word) > 3, text)
+                    text = filter(lambda word: len(word) >= 3, text)
                     text = [ self.stemmer.stem(t) for t in text ]
                     text = " ".join(text)
 
