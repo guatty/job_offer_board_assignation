@@ -109,4 +109,4 @@ class Preprocess:
 
 if __name__ == '__main__':
     pp = Preprocess()
-    preprocess.execute_standard()
+    pp.execute_standard()
