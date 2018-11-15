@@ -78,7 +78,7 @@ class Preprocess:
             self.line['job_type'] = self.unify_job_types(self.line['job_type'])
 
             # inputs line
-            df_line = pd.DataFrame(columns=self.new_df.columns, index=[0])
+            df_line = pd.DataFrame(self.line, columns=self.new_df.columns, index=[0])
             self.new_df = pd.concat([self.new_df, df_line])
 
 
@@ -113,7 +113,6 @@ class Preprocess:
         self.line['true_cpc'] = self.line['total_cost'] / self.line['amount_action_0']
 
     def get_unique_descriptions(self, output):
-
         to_keep = ['id', 'title', 'category', 'country', 'name', 'description', 'job_type', 'budgetmax']
         # agg_first = { key: 'first' for key in to_keep }
         # job_offers_information = self.df.agg( agg_first )
