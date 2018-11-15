@@ -16,11 +16,13 @@ class Preprocess:
 
 
 
-    def __init__(self, raw_data_path = 'data/df_stats.csv', output_filepath='data/cleaned_preprocessed_campaigns.csv'):
-        self.legacy_columns = ['id', 'title', 'category', 'country', 'name', 'keywords', 'description', 'job_type', 'job', 'job_board_id', 'budgetmax', 'creation']
+    def __init__(self, raw_data_path = 'data/df_stats.csv', output_filepath='data/cleaned_preprocessed_campaigns.csv', joi_output='data/joi.csv'):
+        self.legacy_columns = ['id', 'title', 'category', 'country', 'name', 'description', 'job_type', 'job_board_id', 'budgetmax', 'creation']
         self.new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", "volume_conversion", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
-        
+
         self.execute_standard(raw_data_path, output_filepath)
+
+        self.get_unique_descriptions(joi_output)
 
 
     def execute_standard(self, raw, output):
@@ -59,6 +61,7 @@ class Preprocess:
         del self.df['uppdate']
         del self.df['budgetleft']
         del self.df['employer']
+        del self.df['job']
 
         self.df = self.df.dropna()
 
@@ -110,6 +113,13 @@ class Preprocess:
         self.line['taux_conversion_pondere'] = self.line['taux_conversion'] * sqrt(conversion_volume)
         self.line['true_cpc'] = self.line['total_cost'] / self.line['amount_action_0']
 
+    def get_unique_descriptions(self, output):
+
+        to_keep = ['id', 'title', 'category', 'country', 'name', 'description', 'job_type', 'budgetmax']
+        # agg_first = { key: 'first' for key in to_keep }
+        # job_offers_information = self.df.agg( agg_first )
+        job_offers_information = self.df[ to_keep ].groupby('id').first()
+        job_offers_information.to_csv(output)
+
 if __name__ == '__main__':
     pp = Preprocess()
-    preprocess.execute_standard()
