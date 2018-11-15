@@ -38,9 +38,9 @@ FRENCH_STOPWORDS.add('desormais')
 FRENCH_STOPWORDS.add('nous')
 FRENCH_STOPWORDS.add('si')
 
-MAX_NB_WORDS= 200000
+MAX_NB_WORDS= 1000
 
-NB_KEYWORDS = 42
+NB_KEYWORDS = 10
 
 #print(html2text.html2text(contenu_col))
 #df = pd.read_csv('test_correl.csv', delimiter=',', encoding="utf-8-sig")
@@ -76,6 +76,7 @@ def vectorize_column(data_column):
     tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(data_column)
     vector_data = tokenizer.texts_to_sequences(data_column)
+    print(tokenizer.word_index.items())
     return vector_data
 
 def replace_text_by_vector(dataframe,column_to_remove,column_to_add,name_column_to_add):
