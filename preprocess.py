@@ -29,7 +29,6 @@ class Preprocess:
         self.df = pd.read_csv(raw, index_col=0)
         self.remove_useless_data()
 
-
         self.new_df = pd.DataFrame(columns=self.legacy_columns + self.new_columns)
 
         for result in tqdm(self.df.groupby(['id', 'creation']), desc="Preprocessing: "):
