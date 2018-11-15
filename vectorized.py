@@ -11,7 +11,7 @@ import frequency_terms as freq
 from keras.preprocessing.text import Tokenizer
 
 
-# tf_idf 
+# tf_idf
 import nltk
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -43,8 +43,7 @@ FRENCH_STOPWORDS.add('lui')
 
 MAX_NB_WORDS= 1000
 
-
-NB_KEYWORDS = 42
+NB_KEYWORDS = 10
 
 #print(html2text.html2text(contenu_col))
 #df = pd.read_csv('test_correl.csv', delimiter=',', encoding="utf-8-sig")
@@ -61,7 +60,7 @@ def preprocess(text):
     text = filter(lambda word: word not in ENGLISH_STOPWORDS, text)
     text = filter(lambda word: word not in FRENCH_STOPWORDS, text)
     return " ".join(text)
-    
+
 
 def clean_tab(tab):
     for i in range(len(tab)):
@@ -75,7 +74,7 @@ def remove_html_pattern(column):
         element_without_html = html2text.html2text(element)
         without_html_tab.append(element_without_html)
     return without_html_tab
-        
+
 def vectorize_column(data_column):
     tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(data_column)
@@ -89,8 +88,8 @@ def replace_text_by_vector(dataframe,column_to_remove,column_to_add,name_column_
     return dataframe
 
 def convert_df_to_csv(dataframe):
-    dataframe.to_csv('vectorized_campaigns.csv') 
-    
+    dataframe.to_csv('vectorized_campaigns.csv')
+
 #=================================================================
 # tf_idf functions
 #=================================================================
@@ -122,10 +121,10 @@ def get_keys(array_of_tf_idf):
         keys = dictionnaire.keys()
         tab_keys.append(keys)
     return tab_keys
-    
-    
-    
-        
+
+
+
+
 #=================================================================
 # test
 #=================================================================
@@ -155,9 +154,9 @@ with open('data/truc2.csv', 'w') as csvfile:
             else:
                 liste_binaire.append(0)
         spamwriter.writerow(liste_binaire)
-            
-        
-        
+
+
+
 '''
 cv, word_count_vec, feature_names = prepare_tf_idf(clean_description_column)
 keywords = compute_tf_idf_column(clean_description_column,word_count_vec,cv,feature_names)
@@ -246,18 +245,3 @@ df = replace_text_by_vector(df,"job_type",vector_job_type,"vector_job_type")
 
 convert_df_to_csv(df)
 '''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
