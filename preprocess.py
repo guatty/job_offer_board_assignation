@@ -15,10 +15,6 @@ from nltk.stem.snowball import FrenchStemmer
 
 class Preprocess:
 
-
-
-
-
     def __init__(self, raw_data_path = 'data/df_stats.csv', output_filepath='data/cleaned_preprocessed_campaigns.csv', joi_output='data/joi.csv'):
         self.raw_data_path = raw_data_path
         self.output_filepath = output_filepath
@@ -164,10 +160,22 @@ class Preprocess:
         self.french_sw.add('les')
         self.french_sw.add('lui')
 
+    def load_preprocessed(self, path=None):
+        if path is None:
+            path = self.output_filepath
+        self.new_df = pd.read_csv(path, index_col=0)
 
 
 if __name__ == '__main__':
     pp = Preprocess()
 
-    pp.reprocess_df_stats()
+    #pp.reprocess_df_stats()
+    pp.load_preprocessed()
     pp.get_unique_descriptions()
+
+    import matplotlib.pyplot as plt
+    d = pp.new_df['job_board_name'].value_counts()
+    dff = pd.DataFrame(d)
+    dff = dff[ dff > 100 ].dropna()
+    dff.plot(kind='bar')
+    plt.show()
