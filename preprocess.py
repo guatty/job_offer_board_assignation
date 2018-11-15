@@ -9,7 +9,7 @@ from tqdm import tqdm
 import datetime
 import calendar
 import html2text
-from nltk.corpus import stopwords 
+from nltk.corpus import stopwords
 import re
 from nltk.stem.snowball import FrenchStemmer
 
@@ -24,7 +24,7 @@ class Preprocess:
         self.output_filepath = output_filepath
         self.joi_output = joi_output
         self.legacy_columns = ['id', 'title', 'category', 'country', 'name', 'description', 'job_type', 'job_board_id', 'budgetmax', 'creation']
-        self.new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", "volume_conversion", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
+        self.new_columns = ["job_board_name", 'amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", "volume_conversion", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
         self.jobboard_name_for_id = { 31 : "AdformProgrammaticFR", 75 : "AdformProgrammaticGermany", 73 : "AdformProgrammaticNL", 74 : "AdformProgrammaticSwitzerland", 87 : "AdformProgrammaticUK", 76 : "AdformProgrammaticUS", 24 : "Adwords", 96 : "AdwordsFR", 102: "adwords-Switzerland", 101: "AdwordsUS", 4  : "Adzuna", 52 : "Adzuna US", 169: "APEC", 12 : "capital", 25 : "CV Library", 59 : "DoubleclickFR", 58 : "DoubleclickUK", 99 : "Facebook-Austria", 77 : "FacebookFR", 79 : "FacebookGermany", 81 : "Facebook-Netherlands", 80 : "Facebookswitzerland", 16 : "FaceBookUK", 78 : "FacebookUS", 98 : "Gigajob-Austria", 35 : "GigaJobFR", 68 : "Gigajob- Germany", 67 : "GigaJob - Netherlands", 69 : "Gigajob- switzerland", 34 : "GigaJobUK", 54 : "GigaJob US", 10 : "Github", 168: "GoogleJobDiscovery", 1  : "Indeed", 146: "Jobbird-Austria", 147: "Jobbird-Belgium", 156: "jobbird-Canada", 151: "Jobbird-France", 152: "Jobbird-Germany", 148: "Jobbird-India", 145: "Jobbird-Netherlands", 150: "Jobbird-Newzealand", 153: "Jobbird-Spain", 155: "jobbird-Switzerland", 149: "Jobbird-Turkey", 143: "Jobbird-UK", 144: "jobbird-US", 154: "jobboard-Switzerland", 14 : "Jobijoba", 9  : "Jobintree", 36 : "JobisJob", 57 : "JobisJob US", 97 : "Joblift-Austria", 131: "joblift-Belgium", 133: "joblift-Canada", 40 : "Joblift FR", 65 : "Joblift - Germany", 159: "joblift-Germany-d.jobmonitor.com", 158: "joblift-Germany-Muenchener", 136: "joblift-India", 61 : "Joblift-Netherlands", 135: "joblift-newzealand", 132: "joblift-Spain", 66 : "Joblift - Switzerland", 134: "joblift-Turkey", 37 : "JobLift UK", 50 : "Joblift US", 3  : "Jobrapido", 161: "jobrapidoGermany-Jobmonitor", 162: "jobrapidoGermany-muenchener", 60 : "jobrapidoProgrammaticTrendingJobs", 53 : "JobRapido US", 13 : "Jobtome", 157: "JobtomeGermany - de.jobmonitor.com", 88 : "JobtomeGermany - muenchener", 165: "Jobtomeprogrammatic", 39 : "Jobtome UK", 56 : "Jobtome US", 166: "kudos", 26 : "LApec", 7  : "Leboncoin", 19 : "Leboncoin Marque employeur", 100: "Linkedin-Austria", 82 : "LinkedinFR", 83 : "LinkedinGermany", 85 : "Linkedinnetherlands", 84 : "Linkedinswitzerland", 8  : "LinkedinUK", 86 : "LinkedinUS", 18 : "LinkUp", 47 : "LoadTestBoard", 167: "Match2one", 163: "Meteojob", 48 : "Monster", 43 : "MyJobHelper FR", 71 : "Myjobhelper-Germany", 70 : "MyJobHelper - Netherlands", 72 : "MyJobHelper - switzerland", 41 : "MyJobHelper UK", 55 : "MyJobHelper US", 28 : "Name", 42 : "Name", 33 : "Neuvoo", 90 : "NeuvooAustria-Jobleads", 137: "NeuvooBelgium-jobleads", 139: "NeuvooCanada-Jobleads", 93 : "NeuvooFrance-Jobleads", 89 : "NeuvooGermanyjobleads", 95 : "NeuvooGermany-Jobmonitor", 160: "NeuvooGermany-muenchener", 94 : "NeuvooHolland-Jobleads", 140: "NeuvooIndia-Jobleads", 142: "NeuvooNewzealand-jobleads", 138: "NeuvooSpain-jobleads", 91 : "Neuvooswitzerland-Jobleads", 141: "NeuvooTurkey-jobleads", 92 : "NeuvooUK-Jobleads", 51 : "NeuvooUSJobleads", 45 : "Nominal Technology", 2  : "Optioncarriere", 164: "ProgrammaticAppnexus", 113: "restorationmedia-UK", 112: "restorationmedia-US", 104: "ResultsGeneration-UK", 103: "Resultsgeneration -US", 27 : "Sites gratuits TP", 11 : "Stackoverflow", 5  : "Test", 29 : "[test] Job board 31671", 30 : "[test] Job board 73347", 115: "Trendingjobs-UK", 114: "Trendingjobs-US", 6  : "Trovit", 63 : "Trovit- Germany", 62 : "Trovit - Netherlands", 64 : "Trovit- Switzerland", 38 : "Trovit UK", 49 : "Trovit US", 17 : "Twitter", 15 : "Vivastreet", 120: "xpat-Austria", 125: "xpat-Belgium", 128: "xpat-Canada", 119: "xpat-France", 121: "xpat-Germany", 126: "xpat-India", 118: "xpat-Netherlands", 130: "xpat-newzealand", 127: "xpat-Spain", 122: "xpat-Switzerland", 129: "xpat-Turkey", 117: "xpat-UK", 116: "xpat-US", 109: "Yahoo-Austria", 108: "Yahoo-France", 107: "Yahoo-Germany", 110: "Yahoo-Netherlands", 111: "Yahoo-Switzerland", 106: "Yahoo-UK", 105: "Yahoo-US", 46 : "ZipRecruiter-France", 124: "ZipRecruiter-UK", 123: "ZipRecruiter-US"}
         self.stemmer = FrenchStemmer()
         self._set_stopwords()
@@ -112,7 +112,7 @@ class Preprocess:
 
                 self.line[col_name] = clean_desc(column_value)
             elif col_name == "job_board_id":
-                self.line[col_name] = self.jobboard_name_for_id[int( column_value )]
+                self.line["job_board_name"] = self.jobboard_name_for_id[int( column_value )]
             else:
                 self.line[col_name] = column_value
 
@@ -144,7 +144,7 @@ class Preprocess:
         to_keep = ['id', 'title', 'category', 'country', 'name', 'description', 'job_type', 'budgetmax']
         # agg_first = { key: 'first' for key in to_keep }
         # job_offers_information = self.df.agg( agg_first )
-        job_offers_information = self.df[ to_keep ].groupby('id').first()
+        job_offers_information = self.new_df[ to_keep ].groupby('id').first()
         job_offers_information.to_csv(output)
 
     def _set_stopwords(self):
@@ -168,5 +168,5 @@ class Preprocess:
 if __name__ == '__main__':
     pp = Preprocess()
 
-    self.reprocess_df_stats()
-    self.get_unique_descriptions()
+    pp.reprocess_df_stats()
+    pp.get_unique_descriptions()
