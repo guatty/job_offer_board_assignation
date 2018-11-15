@@ -8,7 +8,10 @@ from tqdm import tqdm
 
 import datetime
 import calendar
-
+import html2text
+from nltk.corpus import stopwords 
+import re
+from nltk.stem.snowball import FrenchStemmer
 
 class Preprocess:
 
@@ -19,7 +22,8 @@ class Preprocess:
     def __init__(self, raw_data_path = 'data/df_stats.csv', output_filepath='data/cleaned_preprocessed_campaigns.csv', joi_output='data/joi.csv'):
         self.legacy_columns = ['id', 'title', 'category', 'country', 'name', 'description', 'job_type', 'job_board_id', 'budgetmax', 'creation']
         self.new_columns = ['amount_action_0', 'amount_action_1', 'amount_action_2', 'amount_action_3', 'amount_action_4', 'total_cost', 'true_cpc', 'taux_conversion', "taux_conversion_pondere", "volume_conversion", 'creation_an', 'creation_mois', 'creation_jour', 'weekday']
-
+        self.stemmer = FrenchStemmer()
+        self._set_stopwords()
         self.execute_standard(raw_data_path, output_filepath)
 
         self.get_unique_descriptions(joi_output)
@@ -88,7 +92,23 @@ class Preprocess:
 
     def set_job_offer_info(self, column_value, col_name):
         if col_name in self.legacy_columns:
-            self.line[col_name] = column_value
+            if col_name == "description":
+                def clean_desc(text):
+                    text = html2text.html2text(text)
+                    pattern = re.compile('[\W_]+', re.UNICODE)
+                    text = pattern.sub(' ', text)
+                    text = text.strip().lower().split()
+                    text = filter(lambda word: word not in self.english_sw, text)
+                    text = filter(lambda word: word not in self.french_sw, text)
+                    text = filter(lambda word: len(word) > 3, text)
+                    text = [ self.stemmer.stem(t) for t in text ]
+                    text = " ".join(text)
+
+                    return text
+
+                self.line[col_name] = clean_desc(column_value)
+            else:
+                self.line[col_name] = column_value
 
         if col_name == "creation":
             an, mois, jour = column_value.split('-')
@@ -118,6 +138,24 @@ class Preprocess:
         # job_offers_information = self.df.agg( agg_first )
         job_offers_information = self.df[ to_keep ].groupby('id').first()
         job_offers_information.to_csv(output)
+
+    def _set_stopwords(self):
+        self.english_sw = set(stopwords.words("english"))
+        self.french_sw = set(stopwords.words("french"))
+        self.french_sw.add('dont')
+        self.french_sw.add('votre')
+        self.french_sw.add('notre')
+        self.french_sw.add('autres')
+        self.french_sw.add('autre')
+        self.french_sw.add('sans')
+        self.french_sw.add('leurs')
+        self.french_sw.add('desormais')
+        self.french_sw.add('nous')
+        self.french_sw.add('si')
+        self.french_sw.add('les')
+        self.french_sw.add('lui')
+
+
 
 if __name__ == '__main__':
     pp = Preprocess()
