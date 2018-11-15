@@ -8,12 +8,11 @@ Created on Mon Nov 12 18:13:26 2018
 
 import pandas as pd # manipulation de csv
 import frequency_terms as freq
-from tensorflow.keras.preprocessing.text import Tokenizer
+from keras.preprocessing.text import Tokenizer
 
 
 # tf_idf
 import nltk
-# nltk.download('stopwords')
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -24,6 +23,7 @@ import html2text
 
 import csv
 import tqdm
+
 
 ENGLISH_STOPWORDS = set(stopwords.words("english"))
 FRENCH_STOPWORDS = set(stopwords.words("french"))
@@ -37,6 +37,9 @@ FRENCH_STOPWORDS.add('leurs')
 FRENCH_STOPWORDS.add('desormais')
 FRENCH_STOPWORDS.add('nous')
 FRENCH_STOPWORDS.add('si')
+FRENCH_STOPWORDS.add('les')
+FRENCH_STOPWORDS.add('lui')
+
 
 MAX_NB_WORDS= 1000
 
@@ -75,9 +78,9 @@ def remove_html_pattern(column):
 def vectorize_column(data_column):
     tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(data_column)
+    word_index = tokenizer.word_index
     vector_data = tokenizer.texts_to_sequences(data_column)
-    print(tokenizer.word_index.items())
-    return vector_data
+    return vector_data,word_index
 
 def replace_text_by_vector(dataframe,column_to_remove,column_to_add,name_column_to_add):
     del dataframe[column_to_remove]
@@ -102,7 +105,7 @@ def compute_tf_idf(text,wd,cv,feature_names):
     #generate tf-idf for the given document
     tf_idf_vector=tfidf_transformer.transform(cv.transform([text]))
     sorted_items=freq.sort_coo(tf_idf_vector.tocoo())
-    keywords=freq.extract_topn_from_vector(feature_names,sorted_items,NB_KEYWORDS)
+    keywords=freq.extract_topn_from_vector(feature_names,sorted_items,15)
     return keywords
 
 def compute_tf_idf_column(column,wd,cv,feature_names):
@@ -128,20 +131,40 @@ def get_keys(array_of_tf_idf):
 
 
 
-df = pd.read_csv('data/cleaned_preprocessed_campaigns.csv', delimiter=',', encoding="utf-8")
+df = pd.read_csv('small_data.csv', delimiter=',', encoding="utf-8")
 
 # Vectorization of description column
 
 description_column = df["description"]
 clean_description_column = remove_html_pattern(description_column)
 clean_description_column = clean_tab(clean_description_column)
+vector_description,word_index = vectorize_column(clean_description_column)
 
+with open('data/truc2.csv', 'w') as csvfile:
+    spamwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
+    my_header = []
+    for mot in word_index.keys():
+        my_header.append(mot)
+    spamwriter.writerow(my_header)
+    for description in vector_description:
+        liste_binaire=[]
+        for i in range(len(word_index)) :
+            if i in description:
+                liste_binaire.append(1)
+            else:
+                liste_binaire.append(0)
+        spamwriter.writerow(liste_binaire)
+
+
+
+'''
 cv, word_count_vec, feature_names = prepare_tf_idf(clean_description_column)
 keywords = compute_tf_idf_column(clean_description_column,word_count_vec,cv,feature_names)
+
+
 keys = get_keys(keywords)
-
-print("a")
-
+'''
+'''
 all_ids = []
 # all_words = []
 # for words in keys:
@@ -181,7 +204,8 @@ with open('data/truc2.csv', 'w') as csvfile:
             if (len(keys[index]) == NB_KEYWORDS):
                 spamwriter.writerow(final_list)
 
-'''
+
+
 vector_description = vectorize_column(clean_description_column)
 df = replace_text_by_vector(df,"description",vector_description,"vector_description")
 

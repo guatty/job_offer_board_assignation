@@ -66,3 +66,4 @@ def stats_cluster(liste_job_id):
         stats_cluster.append( get_stat( job_id ) )
 
     return stats_cluster.mean()
+
